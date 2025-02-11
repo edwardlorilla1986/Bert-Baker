@@ -21,30 +21,31 @@ jobs:
 
       - name: Debug Python Environment
         run: |
+          echo "🐍 Python Version:"
           python -V
-          python -m site
+          echo "📂 Python Path:"
           which python
-          pip -V
+          echo "📦 Installed Packages (Before Install):"
           pip list
 
-      - name: Install Dependencies Step 1 (Base Packages)
+      - name: Force Install MoviePy and Dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install --no-cache-dir numpy pandas
-
-      - name: Install Dependencies Step 2 (MoviePy & FFmpeg)
-        run: |
-          pip install --no-cache-dir imageio imageio[ffmpeg]  # Required for MoviePy
-          pip install --no-cache-dir moviepy  # Install MoviePy separately
-          pip install --no-cache-dir opencv-python-headless
+          pip install --force-reinstall --no-cache-dir moviepy
+          pip install --force-reinstall --no-cache-dir numpy pandas imageio imageio[ffmpeg] opencv-python-headless
 
       - name: Verify MoviePy Installation
         run: |
           python -c "import moviepy.editor as mp; print('✅ MoviePy is installed successfully!')"
 
-      - name: Install Dependencies Step 3 (Other Required Libraries)
+      - name: Install Other Required Libraries
         run: |
-          pip install --no-cache-dir elevenlabs whisper ffmpeg-python pysrt
+          pip install --force-reinstall --no-cache-dir elevenlabs whisper ffmpeg-python pysrt
+
+      - name: Debug Python Environment (After Install)
+        run: |
+          echo "📦 Installed Packages (After Install):"
+          pip list
 
       - name: Run Python Script to Generate Video
         env:
@@ -55,4 +56,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: youtube_short_with_subtitles
-          path: youtube_short_with_big_subtitles.mp4
+          path: youtube_short_with_big_subtitles
