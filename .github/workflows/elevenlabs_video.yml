@@ -3,8 +3,8 @@ name: Generate AI TTS Video with Subtitles
 on:
   push:
     branches:
-      - main  # Trigger workflow when pushing to main branch
-  workflow_dispatch:  # Allows manual triggering
+      - main
+  workflow_dispatch:
 
 jobs:
   generate-video:
@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set Up Python
         uses: actions/setup-python@v4
@@ -21,14 +21,14 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install --upgrade pip
-          pip install moviepy elevenlabs whisper ffmpeg-python pysrt
-          sudo apt-get update && sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir moviepy
+          pip install --no-cache-dir elevenlabs whisper ffmpeg-python pysrt numpy imageio imageio[ffmpeg]
 
       - name: Run Python Script to Generate Video
         env:
-          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}  # Store API key as secret
-        run: python generate_video.py  # This script runs your TTS & subtitle automation
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+        run: python generate_video.py
 
       - name: Upload Final Video as Artifact
         uses: actions/upload-artifact@v4
