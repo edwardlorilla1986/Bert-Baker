@@ -28,11 +28,17 @@ jobs:
           echo "📦 Installed Packages (Before Install):"
           pip list
 
+      - name: Remove Existing MoviePy Installation (If Any)
+        run: |
+          pip uninstall -y moviepy
+
       - name: Force Install MoviePy and Dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
+          pip install --force-reinstall --no-cache-dir numpy pandas
+          pip install --force-reinstall --no-cache-dir imageio imageio[ffmpeg]
+          pip install --force-reinstall --no-cache-dir opencv-python-headless
           pip install --force-reinstall --no-cache-dir moviepy
-          pip install --force-reinstall --no-cache-dir numpy pandas imageio imageio[ffmpeg] opencv-python-headless
 
       - name: Verify MoviePy Installation
         run: |
@@ -47,6 +53,10 @@ jobs:
           echo "📦 Installed Packages (After Install):"
           pip list
 
+      - name: Check MoviePy Location
+        run: |
+          python -c "import moviepy; print(moviepy.__file__)"
+
       - name: Run Python Script to Generate Video
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
@@ -56,4 +66,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: youtube_short_with_subtitles
-          path: youtube_short_with_big_subtitles
+          path: youtube_short_with_big_subtitles.mp4
