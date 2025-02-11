@@ -20,31 +20,20 @@ save(audio, audio_filename)
 model = whisper.load_model("small")  # Use "medium" or "large" for better accuracy
 transcription = model.transcribe(audio_filename)
 
-# Step 5: Convert Transcription into FFmpeg DrawText Format
-subtitle_text = ""
-for segment in transcription["segments"]:
-    start_time = segment["start"]
-    end_time = segment["end"]
-    text = segment["text"]
-    subtitle_text += f"drawtext=text='{text}':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=(h-text_h)/2:enable='between(t,{start_time},{end_time})', "
+# Step 5: Create FFmpeg Subtitle Filter File
+subtitle_filename = "subtitles_filter.txt"
 
-subtitle_text = subtitle_text.rstrip(", ")
+with open(subtitle_filename, "w") as f:
+    for segment in transcription["segments"]:
+        start_time = segment["start"]
+        end_time = segment["end"]
+        text = segment["text"].replace("'", "’")  # Fix single quote issue
+        f.write(
+            f"drawtext=text='{text}':fontcolor=white:fontsize=80:x=(w-text_w)/2:y=(h-text_h)/2:enable='between(t,{start_time},{end_time})'\n"
+        )
 
 # Step 6: Load Video & Sync AI Voiceover
 video_filename = "background_video.mp4"  # Ensure this file exists in the repo
 video = mp.VideoFileClip(video_filename)
 audio_clip = mp.AudioFileClip(audio_filename)
-final_video = video.set_audio(audio_clip)
-temp_video_no_subs = "temp_video.mp4"
-final_video.write_videofile(temp_video_no_subs, codec="libx264", fps=30)
-
-# Step 7: Burn Big Centered Subtitles Using FFmpeg
-output_video_with_subs = "youtube_short_with_big_subtitles.mp4"
-
-ffmpeg.input(temp_video_no_subs).output(
-    output_video_with_subs,
-    vf=subtitle_text,
-    codec="libx264"
-).run()
-
-print("✅ YouTube Shorts video with BIG CENTERED subtitles created successfully!")
+final_video = vi
