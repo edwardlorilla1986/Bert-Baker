@@ -30,7 +30,7 @@ jobs:
         run: python generate_video.py  # This script runs your TTS & subtitle automation
 
       - name: Upload Final Video as Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: youtube_short_with_subtitles
           path: youtube_short_with_big_subtitles.mp4
